@@ -14,15 +14,36 @@ export function createTimeline(
 	return newTimeline;
 }
 
-export function useTimeline(key: string, timelineOptions?: gsap.TimelineVars) {
-	let tl = gsapTimelines[key];
+export function loadTimeline(
+	key: string,
+	timelineOptions?: gsap.TimelineVars,
+): gsap.core.Timeline {
+	const originalTimeline: gsap.core.Timeline =
+		gsapTimelines[key] ?? createTimeline(key, timelineOptions);
+	let clearAdded = false;
 
-	if (tl) {
-		tl.restart().then(() => tl.pause());
-	} else {
-		tl = createTimeline("to");
-		tl.play().then(() => tl.pause());
-	}
+	const handler: ProxyHandler<gsap.core.Timeline> = {
+		get(target: gsap.core.Timeline, prop: PropertyKey, receiver: any): any {
+			const origMethod = target[prop as keyof gsap.core.Timeline];
+			if (typeof origMethod === "function") {
+				return (...args: any[]) => {
+					if (!clearAdded) {
+						target.clear();
+						clearAdded = true;
+					}
+					const result = origMethod.apply(target, args);
 
-	return tl;
+					if (prop === "play") {
+						clearAdded = false;
+					}
+
+					// Ensure the proxy maintains the correct this context
+					return result === target ? receiver : result;
+				};
+			}
+			return origMethod;
+		},
+	};
+
+	return new Proxy(originalTimeline, handler);
 }
