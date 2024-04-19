@@ -30,11 +30,6 @@ import { ViewTransitions } from "astro:transitions";
 		</div>
 
 		<script>
-			import gsap from "gsap";
-			window.gsap = gsap;
-		</script>
-
-		<script>
 			if (window.performance && (window.performance as any).memory) {
 				// Function to update the heap size display
 				function updateHeapSize() {

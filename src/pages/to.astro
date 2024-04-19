@@ -40,7 +40,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 	}
 </style>
 
-<script is:inline>
+<script>
+	import gsap from "gsap";
+
 	document.addEventListener(
 		"astro:page-load",
 		() => {
