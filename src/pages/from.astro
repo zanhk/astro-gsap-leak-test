@@ -49,17 +49,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 			// run only if the element is on the page (any better way to do this?)
 			if (!document.getElementById("test-from-animation")) return;
 
-			const timeline = gsapTimelines["to"] ?? createTimeline("to");
-
-			timeline.from(".line span", {
-				y: 100,
-				ease: "power4.out",
-				skewY: 7,
-				stagger: {
-					amount: 0.3,
-				},
-				duration: 0.5,
-			});
+			let timeline = gsapTimelines["from"];
+			if (timeline) {
+				timeline.restart().then(() => timeline.pause());
+			} else {
+				timeline = createTimeline("from").from(".line span", {
+					y: 100,
+					ease: "power4.out",
+					skewY: 7,
+					stagger: {
+						amount: 0.3,
+					},
+					duration: 0.5,
+				});
+				timeline.play().then(() => timeline.pause());
+			}
 		},
 		{ once: false },
 	);
