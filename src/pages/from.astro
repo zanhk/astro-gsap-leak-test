@@ -41,6 +41,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <script>
 	import gsap from "gsap";
+	import { gsapTimelines, createTimeline } from "../scripts/global";
 
 	document.addEventListener(
 		"astro:page-load",
@@ -48,7 +49,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 			// run only if the element is on the page (any better way to do this?)
 			if (!document.getElementById("test-from-animation")) return;
 
-			gsap.timeline().from(".line span", {
+			const timeline = gsapTimelines["to"] ?? createTimeline("to");
+
+			timeline.from(".line span", {
 				y: 100,
 				ease: "power4.out",
 				skewY: 7,
