@@ -18,8 +18,10 @@ export function loadTimeline(
 	key: string,
 	timelineOptions?: gsap.TimelineVars,
 ): gsap.core.Timeline {
-	const originalTimeline: gsap.core.Timeline =
+	// Here take the timeline from the cache if it exists, otherwise create a new one
+	const timeline: gsap.core.Timeline =
 		gsapTimelines[key] ?? createTimeline(key, timelineOptions);
+
 	let clearAdded = false;
 
 	const handler: ProxyHandler<gsap.core.Timeline> = {
@@ -45,5 +47,5 @@ export function loadTimeline(
 		},
 	};
 
-	return new Proxy(originalTimeline, handler);
+	return new Proxy(timeline, handler);
 }
