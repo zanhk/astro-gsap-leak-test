@@ -35,24 +35,30 @@ import { ViewTransitions } from "astro:transitions";
 		</script>
 
 		<script>
-			if (window.performance && window.performance.memory) {
+			if (window.performance && (window.performance as any).memory) {
 				// Function to update the heap size display
 				function updateHeapSize() {
-					var heapSizeBytes =
-						window.performance.memory.usedJSHeapSize;
+					var heapSizeBytes = (window.performance as any).memory
+						.usedJSHeapSize;
 					var heapSizeMB = heapSizeBytes / 1048576; // Convert bytes to megabytes
-					document.getElementById("heap-size").textContent =
-						`Heap Size: ${heapSizeMB.toFixed(2)} MB`;
+					const heapSizeDisplay =
+						document.getElementById("heap-size");
+					if (heapSizeDisplay)
+						heapSizeDisplay.textContent = `Heap Size: ${heapSizeMB.toFixed(2)} MB`;
 				}
 
 				function updateMemoryUsage() {
-					if (performance.memory) {
+					if ((performance as any).memory) {
 						const totalJSHeapSize =
-							performance.memory.totalJSHeapSize / 1048576;
+							(performance as any).memory.totalJSHeapSize /
+							1048576;
 						const jsHeapSizeLimit =
-							performance.memory.jsHeapSizeLimit / 1048576;
-						document.getElementById("memory-usage").textContent =
-							`Total JS Heap Size: ${totalJSHeapSize.toFixed(2)} MB, JS Heap Limit: ${jsHeapSizeLimit.toFixed(2)} MB`;
+							(performance as any).memory.jsHeapSizeLimit /
+							1048576;
+						const memoryUsageDisplay =
+							document.getElementById("memory-usage");
+						if (memoryUsageDisplay)
+							memoryUsageDisplay.textContent = `Total JS Heap Size: ${totalJSHeapSize.toFixed(2)} MB, JS Heap Limit: ${jsHeapSizeLimit.toFixed(2)} MB`;
 					}
 				}
 
@@ -66,8 +72,10 @@ import { ViewTransitions } from "astro:transitions";
 
 					if (deltaTime >= 1000) {
 						const fps = frameCount / (deltaTime / 1000);
-						document.getElementById("fps-display").textContent =
-							`FPS: ${Math.round(fps)}`;
+						const fpsDisplay =
+							document.getElementById("fps-display");
+						if (fpsDisplay)
+							fpsDisplay.textContent = `FPS: ${Math.round(fps)}`;
 						frameCount = 0;
 						lastFrameTime = now;
 					}
@@ -102,11 +110,16 @@ import { ViewTransitions } from "astro:transitions";
 					onOriginalPage = !onOriginalPage;
 				}, 100);
 
-				document.getElementById("start-auto-switcher").textContent =
-					"Refresh the page to stop auto switcher";
+				const startAutoSwitcher = document.getElementById(
+					"start-auto-switcher",
+				);
+				if (startAutoSwitcher) {
+					startAutoSwitcher.textContent =
+						"Refresh the page to stop auto switcher";
+				}
 			}
 
-			window.startNavigation = startNavigation;
+			(window as any).startNavigation = startNavigation;
 		</script>
 	</body>
 </html>
