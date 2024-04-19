@@ -1,0 +1,30 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		// change here if you are on macos
+		{
+			"command": "call .\\node_modules\\.bin\\astro dev --host 127.0.0.1",
+			"name": "server",
+			"request": "launch",
+			"type": "node-terminal",
+			"internalConsoleOptions": "neverOpen"
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "client",
+			"url": "http://localhost:4321",
+			"webRoot": "${workspaceFolder}/src",
+			"sourceMapPathOverrides": {
+				"vite:///src/*": "${webRoot}/*"
+			},
+			"skipFiles": ["**/node_modules/**"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Debug Server and Client",
+			"configurations": ["server", "client"]
+		}
+	]
+}

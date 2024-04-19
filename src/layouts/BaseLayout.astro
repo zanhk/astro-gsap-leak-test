@@ -1,0 +1,112 @@
+---
+import { ViewTransitions } from "astro:transitions";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+		<ViewTransitions />
+	</head>
+	<body>
+		<header transition:persist>
+			<button id="start-auto-switcher" onclick="startNavigation()"
+				>start auto switcher (switch from index page to "to" page)</button
+			>
+		</header>
+		<h1>Astro gsap leak test</h1>
+
+		<div style="height: 20rem;">
+			<slot />
+		</div>
+
+		<div transition:persist>
+			<div id="heap-size"></div>
+			<div id="memory-usage"></div>
+			<div id="fps-display"></div>
+		</div>
+
+		<script>
+			import gsap from "gsap";
+			window.gsap = gsap;
+		</script>
+
+		<script>
+			if (window.performance && window.performance.memory) {
+				// Function to update the heap size display
+				function updateHeapSize() {
+					var heapSizeBytes =
+						window.performance.memory.usedJSHeapSize;
+					var heapSizeMB = heapSizeBytes / 1048576; // Convert bytes to megabytes
+					document.getElementById("heap-size").textContent =
+						`Heap Size: ${heapSizeMB.toFixed(2)} MB`;
+				}
+
+				function updateMemoryUsage() {
+					if (performance.memory) {
+						const totalJSHeapSize =
+							performance.memory.totalJSHeapSize / 1048576;
+						const jsHeapSizeLimit =
+							performance.memory.jsHeapSizeLimit / 1048576;
+						document.getElementById("memory-usage").textContent =
+							`Total JS Heap Size: ${totalJSHeapSize.toFixed(2)} MB, JS Heap Limit: ${jsHeapSizeLimit.toFixed(2)} MB`;
+					}
+				}
+
+				let lastFrameTime = Date.now();
+				let frameCount = 0;
+
+				function updateFPS() {
+					const now = Date.now();
+					const deltaTime = now - lastFrameTime;
+					frameCount++;
+
+					if (deltaTime >= 1000) {
+						const fps = frameCount / (deltaTime / 1000);
+						document.getElementById("fps-display").textContent =
+							`FPS: ${Math.round(fps)}`;
+						frameCount = 0;
+						lastFrameTime = now;
+					}
+
+					requestAnimationFrame(updateFPS);
+				}
+
+				setInterval(updateMemoryUsage, 100);
+				setInterval(updateHeapSize, 100);
+				requestAnimationFrame(updateFPS);
+			} else {
+				console.log(
+					"The performance.memory API is not supported on this browser.",
+				);
+			}
+		</script>
+
+		<script>
+			import { navigate } from "astro:transitions/client";
+			var onOriginalPage = true;
+
+			function startNavigation() {
+				setInterval(function () {
+					var originalUrl = "/";
+					var alternateUrl = "/to";
+
+					if (onOriginalPage) {
+						navigate(alternateUrl);
+					} else {
+						navigate(originalUrl);
+					}
+					onOriginalPage = !onOriginalPage;
+				}, 100);
+
+				document.getElementById("start-auto-switcher").textContent =
+					"Refresh the page to stop auto switcher";
+			}
+
+			window.startNavigation = startNavigation;
+		</script>
+	</body>
+</html>

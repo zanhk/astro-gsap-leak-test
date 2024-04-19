@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout>
+	<a href="/">Navigate to index</a>
+
+	<div id="test-from-animation" class="container">
+		<div class="line">
+			<span>Test page!</span>
+		</div>
+		<div class="line">
+			<span>This title instead</span>
+		</div>
+		<div class="line">
+			<span>is animated.</span>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	.container .line {
+		width: 100%;
+		height: 70px;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.container .line span {
+		position: absolute;
+		font-size: 3rem;
+		line-height: 4.2rem;
+	}
+</style>
+
+<script is:inline>
+	document.addEventListener(
+		"astro:page-load",
+		() => {
+			// run only if the element is on the page (any better way to do this?)
+			if (!document.getElementById("test-from-animation")) return;
+
+			gsap.timeline().from(".line span", {
+				y: 100,
+				ease: "power4.out",
+				skewY: 7,
+				stagger: {
+					amount: 0.3,
+				},
+				duration: 0.5,
+			});
+		},
+		{ once: false },
+	);
+</script>
